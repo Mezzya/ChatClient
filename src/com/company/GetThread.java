@@ -28,7 +28,11 @@ public class GetThread implements Runnable {
             while ( ! Thread.interrupted()) {
                 URL url = new URL(Utils.getURL() + "/get?from=" + n);
                 HttpURLConnection http = (HttpURLConnection) url.openConnection();
-
+                if (http.getResponseCode()!=200){
+                    System.out.println("Error");
+                    Thread.sleep(5000);
+                    continue;
+                }
                 InputStream is = http.getInputStream();
                 try {
                     byte[] buf = requestBodyToArray(is);
@@ -46,7 +50,7 @@ public class GetThread implements Runnable {
                     is.close();
                 }
 
-                Thread.sleep(5000);
+                Thread.sleep(500);
             }
         } catch (Exception ex) {
             ex.printStackTrace();

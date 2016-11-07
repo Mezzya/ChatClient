@@ -19,7 +19,16 @@ public class Message {
 	public Message(String from, String text) {
 		this.from = from;
 		this.text = text;
+		this.to = "All";
 	}
+
+	public Message(String from, String to, String text) {
+		this.from = from;
+		this.text = text;
+		this.to = to;
+	}
+
+
 
 	public String toJSON() {
 		Gson gson = new GsonBuilder().create();
