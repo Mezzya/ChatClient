@@ -14,6 +14,7 @@ public class Main {
 		Scanner scanner = new Scanner(System.in);
 		String login;
 		String password;
+		String room="All";
 		try {
 			do {
 				System.out.println("Enter your login: ");
@@ -21,13 +22,14 @@ public class Main {
 				System.out.println("Enter your password: ");
 				password = scanner.nextLine();
 
-			} while (!login(login,password));
+			} while (sendToServer("/login?login="+login+"&password="+password)!=200);
 
 			Thread th = new Thread(new GetThread(cm));
 			th.setDaemon(true);
 			th.start();
 
             System.out.println("Enter your message: ");
+
 			while (true) {
 
 				String text = scanner.nextLine();
@@ -36,7 +38,8 @@ public class Main {
 				if (text.equals("-getusers"))
 				{
 //					Запрос на онлайн пользователей
-					getUserOnline();
+					int result =sendToServer("/getusers");
+					if (result!=200) System.out.println("Error. code : "+result);
 					continue;
 				}
 
@@ -58,10 +61,32 @@ public class Main {
 					continue;
 				}
 
+				if (text.equals("-roomin"))
+				{
+//					Входим в комнату
+					System.out.println("Enter room in:");
+					room = scanner.nextLine();
 
+					int result =sendToServer("/room?room="+room);
+					if (result!=200) System.out.println("Error. code : "+result);
+					else System.out.println("Enter to room :"+room);
 
-				Message m = new Message(login, text);
-				System.out.println("Out msg");
+					continue;
+				}
+
+				if (text.equals("-roomout"))
+				{
+//					Выходим из комнаты
+
+					int result =sendToServer("/room?room=exit");
+					if (result!=200) System.out.println("Error. code : "+result);
+					else System.out.println("Exit from room : "+room);
+					room="All";
+					continue;
+				}
+
+				Message m = new Message(login,"All",room, text);
+
 				int res = m.send(Utils.getURL() + "/add");
 
 				if (res != 200) { // 200 OK
@@ -76,34 +101,19 @@ public class Main {
 			scanner.close();
 		}
 	}
-	public static boolean login(String login, String password)
-	{
 
-		try {
-			URL url = new URL(Utils.getURL() + "/login?login="+login+"&password="+password);
+	public static int sendToServer(String param)
+	{
+		try{
+			URL url = new URL(Utils.getURL() + param);
+
 			HttpURLConnection http = (HttpURLConnection) url.openConnection();
-			if (http.getResponseCode()==HttpURLConnection.HTTP_OK) return true;
+			return http.getResponseCode();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Error connect server... Try again...");
-		return false;
 
-
+		return -1;
 
 	}
-
-	public static void getUserOnline()
-	{
-
-		try{
-		URL url = new URL(Utils.getURL() + "/getusers");
-		HttpURLConnection http = (HttpURLConnection) url.openConnection();
-			System.out.println(http.getResponseCode());
-	} catch (IOException e) {
-		e.printStackTrace();
-	}
-
-
-}
 }

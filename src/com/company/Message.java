@@ -15,11 +15,13 @@ public class Message {
 	private String from;
 	private String to;
 	private String text;
+	private String room;
 
 	public Message(String from, String text) {
 		this.from = from;
 		this.text = text;
 		this.to = "All";
+		this.room="All";
 	}
 
 	public Message(String from, String to, String text) {
@@ -27,6 +29,14 @@ public class Message {
 		this.text = text;
 		this.to = to;
 	}
+
+	public Message(String from, String to, String room, String text) {
+		this.from = from;
+		this.text = text;
+		this.to = to;
+		this.room = room;
+	}
+
 
 
 
@@ -44,6 +54,7 @@ public class Message {
 	public String toString() {
 		return new StringBuilder().append("[").append(date)
 				.append(", From: ").append(from).append(", To: ").append(to)
+				.append(", Room: ").append(room)
 				.append("] ").append(text)
                 .toString();
 	}
